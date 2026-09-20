@@ -8,17 +8,28 @@ app = FastAPI(
     description="Admin dashboard backend for ride operations demo system.",
 )
 
+# Fetch allowed origins from settings or default to allow all origins for deployment
+allowed_origins = getattr(settings, "CORS_ORIGINS", ["*"])
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
+    allow_origins=allowed_origins if allowed_origins else ["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+@app.get("/")
+def root():
+    return {
+        "message": "Welcome to UBER COMMAND CENTER API",
+        "docs": "/docs",
+        "status": "online"
+    }
+
 @app.get("/health")
 def health_check():
-    return {"status": "ok", "service": settings.app_name}
+    return {"status": "ok", "service": getattr(settings, "app_name", "UBER COMMAND CENTER")}
 
 @app.get("/api/dashboard/summary")
 def dashboard_summary():
